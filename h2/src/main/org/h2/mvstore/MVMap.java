@@ -1749,6 +1749,7 @@ public class MVMap<K, V> extends AbstractMap<K, V>
                         }
                         break;
                     }
+                    default:
                 }
                 rootPage = replacePage(pos, p, unsavedMemoryHolder);
                 if (lockedRootReference == null) {

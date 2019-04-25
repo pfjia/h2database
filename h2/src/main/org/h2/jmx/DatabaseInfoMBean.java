@@ -166,4 +166,6 @@ public interface DatabaseInfoMBean {
      */
     String listSessions();
 
+    String  getMapNames();
+
 }

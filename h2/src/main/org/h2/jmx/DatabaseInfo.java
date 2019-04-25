@@ -5,23 +5,25 @@
  */
 package org.h2.jmx;
 
-import java.lang.management.ManagementFactory;
-
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.management.JMException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.h2.command.Command;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
 import org.h2.engine.Session;
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
 import org.h2.store.PageStore;
 import org.h2.table.Table;
+
+import javax.management.JMException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The MBean implementation.
@@ -33,7 +35,9 @@ public class DatabaseInfo implements DatabaseInfoMBean {
 
     private static final Map<String, ObjectName> MBEANS = new HashMap<>();
 
-    /** Database. */
+    /**
+     * Database.
+     */
     private final Database database;
 
     private DatabaseInfo(Database database) {
@@ -65,10 +69,10 @@ public class DatabaseInfo implements DatabaseInfoMBean {
      * Registers an MBean for the database.
      *
      * @param connectionInfo connection info
-     * @param database database
+     * @param database       database
      */
     public static void registerMBean(ConnectionInfo connectionInfo,
-            Database database) throws JMException {
+                                     Database database) throws JMException {
         String path = connectionInfo.getName();
         if (!MBEANS.containsKey(path)) {
             MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
@@ -231,7 +235,7 @@ public class DatabaseInfo implements DatabaseInfoMBean {
         StringBuilder buff = new StringBuilder();
         for (Map.Entry<String, String> e :
                 new TreeMap<>(
-                database.getSettings().getSettings()).entrySet()) {
+                        database.getSettings().getSettings()).entrySet()) {
             buff.append(e.getKey()).append(" = ").append(e.getValue()).append('\n');
         }
         return buff.toString();
@@ -274,5 +278,30 @@ public class DatabaseInfo implements DatabaseInfoMBean {
         }
         return buff.toString();
     }
+
+
+//   增加若干暴露的属性
+
+
+    @Override
+    public String getMapNames() {
+        Set<String> mapNames = database.getStore().getMvStore().getMapNames();
+        return mapNames.toString();
+    }
+
+//    由于MVMap被锁住，因此无法通过JMX获取数据
+//    @Override
+//    public String getSomething() {
+//        MVStore mvStore = database.getStore().getMvStore();
+//        JSONObject jsonObject = new JSONObject();
+//        Map<String, Set<Map.Entry<Object, Object>>> map = mvStore.getMapNames()
+//                .stream()
+//                .map(mvStore::openMap)
+//                .collect(Collectors.toMap(MVMap::getName, MVMap::entrySet));
+//
+//
+//        jsonObject.put("keyValueMap", map);
+//        return JSON.toJSONString(jsonObject);
+//    }
 
 }

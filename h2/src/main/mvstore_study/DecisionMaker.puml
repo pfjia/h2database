@@ -1,0 +1,40 @@
+@startuml
+
+class MVMap.DecisionMaker{
++ Decision decide(V existingValue, V providedValue)
++ <T extends V> T selectValue(T existingValue, T providedValue)
++ void reset()
+}
+
+class RollbackDecisionMaker
+
+class TxDecisionMaker
+
+class PutDecisionMaker
+
+class PutIfAbsentDecisionMaker
+
+class LockDecisionMaker
+
+
+class CommitDecisionMaker
+
+class EqualsDecisionMaker
+
+
+MVMap.DecisionMaker <|-- RollbackDecisionMaker
+MVMap.DecisionMaker <|-- TxDecisionMaker
+MVMap.DecisionMaker <|-- CommitDecisionMaker
+MVMap.DecisionMaker <|-- EqualsDecisionMaker
+
+MVMap.DecisionMaker <|-- DEFAULT
+MVMap.DecisionMaker <|-- PUT
+MVMap.DecisionMaker <|-- REMOVE
+MVMap.DecisionMaker <|-- IF_ABSENT
+MVMap.DecisionMaker <|-- IF_PRESENT
+
+TxDecisionMaker <|-- PutDecisionMaker
+TxDecisionMaker <|-- LockDecisionMaker
+PutDecisionMaker<|-- PutIfAbsentDecisionMaker
+
+@enduml

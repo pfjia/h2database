@@ -197,6 +197,7 @@ public final class MVRTreeMap<V> extends MVMap<SpatialKey, V> {
                         p.setValue(index, value);
                     }
                     break;
+                    default :
             }
             return result;
         }

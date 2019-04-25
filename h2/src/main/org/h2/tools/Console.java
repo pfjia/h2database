@@ -5,20 +5,17 @@
  */
 package org.h2.tools;
 
+import org.h2.server.ShutdownHandler;
+import org.h2.util.*;
+
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.h2.server.ShutdownHandler;
-import org.h2.util.JdbcUtils;
-import org.h2.util.MathUtils;
-import org.h2.util.StringUtils;
-import org.h2.util.Tool;
-import org.h2.util.Utils;
 
 /**
  * Starts the H2 Console (web-) server, as well as the TCP and PG server.
- * @h2.resource
  *
  * @author Thomas Mueller, Ridvan Agar
+ * @h2.resource
  */
 public class Console extends Tool implements ShutdownHandler {
 
@@ -58,9 +55,9 @@ public class Console extends Tool implements ShutdownHandler {
      * for details, see the Server tool.<br />
      * If a service can not be started, the program
      * terminates with an exit code of 1.
-     * @h2.resource
      *
      * @param args the command line arguments
+     * @h2.resource
      */
     public static void main(String... args) throws SQLException {
         Console console;
@@ -173,6 +170,9 @@ public class Console extends Tool implements ShutdownHandler {
             } else if ("-ifExists".equals(arg)) {
                 // no parameters
                 ifExists = true;
+            } else if ("-ifNotExists".equals(arg)) {
+                //no parameters
+//                增加此判断使选项支持“-ifNotExists”
             } else if ("-baseDir".equals(arg)) {
                 i++;
             } else {
@@ -216,7 +216,7 @@ public class Console extends Tool implements ShutdownHandler {
             }
         }
 
-        if (toolStart && webRunning){
+        if (toolStart && webRunning) {
             show();
         }
 

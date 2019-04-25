@@ -2948,9 +2948,9 @@ public class MVStore implements AutoCloseable {
         // start the background thread if needed
         if (millis > 0 && isOpen()) {
             int sleep = Math.max(1, millis / 10);
-            BackgroundWriterThread t =
-                    new BackgroundWriterThread(this, sleep,
-                            fileStore.toString());
+            // FIXME: 2019/4/23 为了调试方便，sleep修改为0
+//            BackgroundWriterThread t = new BackgroundWriterThread(this, sleep, fileStore.toString());
+            BackgroundWriterThread t = new BackgroundWriterThread(this, 1000_000_000, fileStore.toString());
             if (backgroundWriterThread.compareAndSet(null, t)) {
                 t.start();
             }

@@ -1,0 +1,64 @@
+@startuml
+
+== 开启事务 ==
+[->Thread:run
+Thread->TcpServerThread:run
+TcpServerThread->TcpServerThread:process
+TcpServerThread->Command:executeUpdate
+Command->Session:setSavepoint
+Session->Session:getStatementSavepoint
+Session->Session:getTransaction
+Session->TransactionStore:begin
+return transaction
+
+
+==  写undoLog ==
+
+Command->CommandContainer:update
+CommandContainer->Insert:update
+Insert->Insert:insertRows
+Insert->MVTable:addRow
+MVTable->MVPrimaryIndex:add
+MVPrimaryIndex->TransactionMap:putIfAbsent
+TransactionMap->TransactionMap:set
+TransactionMap->MVMap:operate
+MVMap->TxDecisionMaker_PutIfAbsentDecisionMaker:decide
+TxDecisionMaker_PutIfAbsentDecisionMaker->TxDecisionMaker_PutIfAbsentDecisionMaker:decide
+TxDecisionMaker_PutIfAbsentDecisionMaker->TxDecisionMaker:logIt
+TxDecisionMaker->Transaction:log
+Transaction->TransactionStore:addUndoLogRecord
+TransactionStore->MVMap:append
+note right:在undoLog中添加记录
+
+
+==  插入数据 ==
+
+TxDecisionMaker_PutIfAbsentDecisionMaker->MVMap:返回VersionedValueUncommitted
+MVMap->MVMap:插入VersionedValueUncommitted
+
+
+== 事务提交 ==
+
+Command->CommandContainer:stop
+CommandContainer->Command:stop
+Command->Session:commit
+loop 所有table commit
+Session->Table:commit
+end
+Session->Transaction:commit
+Transaction->TransactionStore:commit
+TransactionStore->TransactionStore:renameMap
+note right:将"undoLog.id"重命名为"undoLog-id",如将"undoLog.1"重命名为"undoLog-1"
+loop 执行所有undoLog中的记录
+TransactionStore->MVMap:operate(key,dummy,commitDecisionMaker)
+note right:使用VersionedValueUncommitted中的value替换VersionedValueUncommitted
+end
+TransactionStore->MVMap:clear
+note right:清空undoLog的记录
+TransactionStore->TransactionStore:renameMap
+note right:将undoLog重命名为原来的名字
+
+
+
+
+@enduml

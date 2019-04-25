@@ -1,0 +1,28 @@
+@startuml
+
+class VersionedValue{
++ Object getCurrentValue()
++ long getOperationId()
++ Object getCommittedValue()
++ boolean isCommitted()
+}
+class VersionedValueCommitted
+class VersionedValueUncommitted
+
+class Value
+class ValueInt
+class ValueLong
+class ValueArray
+class ValueXXX
+
+
+VersionedValue <|-- VersionedValueCommitted
+VersionedValueCommitted <|-- VersionedValueUncommitted
+
+VersionedValue <|--Value
+Value <|--ValueInt
+Value <|--ValueLong
+Value <|--ValueXXX
+Value <|--ValueArray
+
+@enduml

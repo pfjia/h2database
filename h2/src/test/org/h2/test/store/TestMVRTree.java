@@ -115,7 +115,7 @@ public class TestMVRTree extends TestMVStore {
         assertEquals("1: (1.1/2.2, 3.3/4.4)", c0.toString());
     }
 
-    private void testExample() {
+    public void testExample() {
         // create an in-memory store
         MVStore s = MVStore.open(null);
 
